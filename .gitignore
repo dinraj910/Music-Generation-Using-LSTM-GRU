@@ -1,0 +1,11 @@
+*.h5
+*.keras
+*.ckpt
+*.log
+*.pkl
+*.json
+*.csv
+*.midi
+*.wav
+*.mp3
+*.pb

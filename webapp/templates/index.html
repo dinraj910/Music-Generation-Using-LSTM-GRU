@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Neural Music Generation | AI Composer</title>
+    
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tone.js for Audio -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-gradient"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top glass-nav">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="brand-icon me-2">🎹</span>
+                <span class="brand-text">Neural <span class="text-gradient">Music</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="bi bi-music-note-beamed me-1"></i>Compose</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="bi bi-info-circle me-1"></i>About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com" target="_blank"><i class="bi bi-github me-1"></i>GitHub</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container py-5 mt-5">
+        <!-- Hero Section -->
+        <section class="text-center mb-5 hero-section">
+            <h1 class="display-4 fw-bold mb-3">
+                AI-Powered <span class="text-gradient">Music Generation</span>
+            </h1>
+            <p class="lead text-muted mb-4">
+                Create melodies with LSTM, GRU, and BiLSTM neural networks trained on classical music
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <span class="badge bg-primary bg-opacity-25 text-primary px-3 py-2">
+                    <i class="bi bi-cpu me-1"></i>LSTM
+                </span>
+                <span class="badge bg-success bg-opacity-25 text-success px-3 py-2">
+                    <i class="bi bi-cpu me-1"></i>GRU
+                </span>
+                <span class="badge bg-danger bg-opacity-25 text-danger px-3 py-2">
+                    <i class="bi bi-cpu me-1"></i>BiLSTM
+                </span>
+            </div>
+        </section>
+
+        <div class="row g-4">
+            <!-- Left Panel - Controls -->
+            <div class="col-lg-4">
+                <!-- Model Selection Card -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Model Selection</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="model-options">
+                            <div class="form-check model-option selected" data-model="lstm">
+                                <input class="form-check-input" type="radio" name="model" id="modelLSTM" value="lstm" checked>
+                                <label class="form-check-label" for="modelLSTM">
+                                    <span class="model-name">Stacked LSTM</span>
+                                    <span class="model-badge badge bg-primary">Recommended</span>
+                                    <small class="text-muted d-block">Best for melodic sequences</small>
+                                </label>
+                            </div>
+                            <div class="form-check model-option" data-model="gru">
+                                <input class="form-check-input" type="radio" name="model" id="modelGRU" value="gru">
+                                <label class="form-check-label" for="modelGRU">
+                                    <span class="model-name">Stacked GRU</span>
+                                    <span class="model-badge badge bg-success">Fast</span>
+                                    <small class="text-muted d-block">Faster, comparable quality</small>
+                                </label>
+                            </div>
+                            <div class="form-check model-option" data-model="bilstm">
+                                <input class="form-check-input" type="radio" name="model" id="modelBiLSTM" value="bilstm">
+                                <label class="form-check-label" for="modelBiLSTM">
+                                    <span class="model-name">BiLSTM</span>
+                                    <span class="model-badge badge bg-warning text-dark">Experimental</span>
+                                    <small class="text-muted d-block">Classifier (limited generation)</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parameters Card -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-sliders me-2"></i>Parameters</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label class="form-label d-flex justify-content-between">
+                                <span><i class="bi bi-thermometer-half me-1"></i>Temperature</span>
+                                <span class="badge bg-secondary" id="tempValue">0.8</span>
+                            </label>
+                            <input type="range" class="form-range custom-range" id="temperature" 
+                                   min="0.1" max="2.0" step="0.1" value="0.8">
+                            <div class="d-flex justify-content-between mt-1">
+                                <small class="text-muted">Conservative</small>
+                                <small class="text-muted">Creative</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label d-flex justify-content-between">
+                                <span><i class="bi bi-music-note-list me-1"></i>Generate Length</span>
+                                <span class="badge bg-secondary" id="lengthValue">100</span>
+                            </label>
+                            <input type="range" class="form-range custom-range" id="genLength" 
+                                   min="50" max="300" step="10" value="100">
+                            <div class="d-flex justify-content-between mt-1">
+                                <small class="text-muted">50 notes</small>
+                                <small class="text-muted">300 notes</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Sequences Card -->
+                <div class="card glass-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-collection me-2"></i>Sample Sequences</h5>
+                    </div>
+                    <div class="card-body sample-sequences">
+                        {% for key, sample in samples.items() %}
+                        <button class="btn btn-outline-light sample-btn w-100 mb-2 text-start" 
+                                data-sample="{{ key }}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-music-note me-2"></i>{{ sample.name }}
+                                    <small class="d-block text-muted">{{ sample.description }}</small>
+                                </div>
+                                <i class="bi bi-arrow-right"></i>
+                            </div>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Piano & Output -->
+            <div class="col-lg-8">
+                <!-- Piano Keyboard Card -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-keyboard me-2"></i>Virtual Piano</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-light" id="clearPiano" title="Clear All">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <button class="btn btn-outline-light" id="undoNote" title="Undo">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-outline-light" id="addRest" title="Add REST">
+                                <i class="bi bi-pause-circle"></i> REST
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="piano-container">
+                            <div class="piano-keyboard" id="pianoKeyboard">
+                                <!-- Piano keys generated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="piano-info p-3">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Click keys or use keyboard (A-L for white, W-P for black) | 
+                                Need at least 32 notes
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Sequence Card -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-music me-2"></i>Input Sequence
+                            <span class="badge bg-primary ms-2" id="noteCount">0/32</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-info" id="playSequence" disabled>
+                            <i class="bi bi-play-fill"></i> Play
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="sequence-display" id="sequenceDisplay">
+                            <span class="placeholder-text">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Click piano keys or select a sample to start
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="text-center mb-4">
+                    <button class="btn btn-primary btn-lg generate-btn px-5" id="generateBtn" disabled>
+                        <i class="bi bi-magic me-2"></i>Generate Music
+                        <span class="spinner-border spinner-border-sm ms-2 d-none" id="generateSpinner"></span>
+                    </button>
+                </div>
+
+                <!-- Output Card -->
+                <div class="card glass-card output-card d-none" id="outputCard">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-music-note-beamed me-2"></i>Generated Music</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-success" id="playGenerated">
+                                <i class="bi bi-play-fill"></i> Play
+                            </button>
+                            <button class="btn btn-outline-primary" id="downloadMidi">
+                                <i class="bi bi-download"></i> Download MIDI
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Stats Row -->
+                        <div class="row g-3 mb-4" id="generationStats">
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statNotes">-</div>
+                                    <div class="stat-label">Total Notes</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statUnique">-</div>
+                                    <div class="stat-label">Unique Pitches</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statRest">-</div>
+                                    <div class="stat-label">Rest %</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statDuration">-</div>
+                                    <div class="stat-label">Duration</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generated Notes Display -->
+                        <div class="generated-sequence-container">
+                            <h6 class="mb-2"><i class="bi bi-music-note-list me-2"></i>Generated Sequence</h6>
+                            <div class="sequence-display generated" id="generatedDisplay">
+                                <!-- Generated notes will appear here -->
+                            </div>
+                        </div>
+
+                        <!-- Warning for BiLSTM -->
+                        <div class="alert alert-warning d-none mt-3" id="bilstmWarning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Note:</strong> BiLSTM cannot truly generate music autoregressively as it uses 
+                            future context during training. Results may be less coherent.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container text-center py-4">
+            <p class="mb-2">
+                <span class="text-gradient fw-bold">Neural Music Generation</span>
+                — LSTM · GRU · BiLSTM
+            </p>
+            <p class="text-muted small mb-0">
+                Built with <i class="bi bi-heart-fill text-danger"></i> using 
+                TensorFlow, Flask & Bootstrap | 
+                <a href="https://dinrajkdinesh.vercel.app" target="_blank" class="text-decoration-none">
+                    DINRAJ K DINESH
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="bi bi-music-note-beamed me-2 text-primary"></i>
+                <strong class="me-auto">Neural Music</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Message here
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Data (hidden) -->
+    <script id="sampleData" type="application/json">
+        {{ samples | tojson | safe }}
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/piano.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
