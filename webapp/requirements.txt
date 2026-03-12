@@ -1,0 +1,21 @@
+# ═══════════════════════════════════════════════════════════════════════
+# NEURAL MUSIC GENERATION - Web Application Requirements
+# ═══════════════════════════════════════════════════════════════════════
+
+# Core Framework
+Flask>=2.3.0
+Werkzeug>=2.3.0
+
+# Deep Learning
+tensorflow>=2.13.0
+numpy>=1.24.0
+
+# MIDI Processing
+pretty_midi>=0.2.10
+midiutil>=1.2.1
+
+# Optional: music21 for advanced MIDI features
+# music21>=9.1.0
+
+# Production Server (optional)
+gunicorn>=21.0.0
