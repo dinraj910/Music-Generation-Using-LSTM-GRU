@@ -1,0 +1,77 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Neural Music Generation - .gitignore
+# ═══════════════════════════════════════════════════════════════════════
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+
+
+# TensorFlow / Keras
+*.h5
+*.keras
+*.tflite
+*.pb
+checkpoint
+*.ckpt*
+*.index
+*.data-*
+
+# MIDI output (keep .gitkeep)
+output/midi/*.mid
+output/midi/*.midi
+!output/midi/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.env
+secrets.json
+
+# Large model files (uncomment if needed)
+# music_rnn/*.keras
+# music_rnn/*.h5
+# music_rnn/**/saved_model/
+
+# Test files
+test_*.mid
+test_*.midi
