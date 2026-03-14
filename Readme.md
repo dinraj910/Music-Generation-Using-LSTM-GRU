@@ -346,21 +346,30 @@ python app.py
 ### 🎹 Main Interface
 *Interactive piano with model selection and parameter controls*
 
-<img src="docs/screenshot-main.png" alt="Main Interface" width="800"/>
+![screenshot/1.png](screenshot/1.png)
+
+![alt text](screenshot/2.png)
+
+![alt text](screenshot/3.png)
+
+![alt text](screenshot/4.png)
+
+![alt text](screenshot/5.png)
+
+![alt text](screenshot/6.png)
 
 <br/><br/>
 
 ### 🎼 Generation Results
 *Generated music with statistics and playback controls*
 
-<img src="docs/screenshot-output.png" alt="Generation Output" width="800"/>
+![alt text](screenshot/7.png)
+
+![alt text](screenshot/8.png)
+
+![alt text](screenshot/9.png)
 
 <br/><br/>
-
-### 📊 Training Curves
-*Model comparison: Loss and Accuracy over epochs*
-
-<img src="docs/training-curves.png" alt="Training Curves" width="800"/>
 
 </div>
 
